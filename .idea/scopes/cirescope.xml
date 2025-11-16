@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="cirescope" pattern="file[AP-CSP-Create-Task-Class-Assignment.main]:java/me/cire3//*" />
+</component>
