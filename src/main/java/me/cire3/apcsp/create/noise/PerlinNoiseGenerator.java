@@ -15,6 +15,8 @@
 
 package me.cire3.apcsp.create.noise;
 
+import static me.cire3.apcsp.create.MathUtils.clamp;
+
 public class PerlinNoiseGenerator implements NoiseGenerator {
     private static final int[] PERMUTATIONS = new int[512];
 
@@ -39,6 +41,20 @@ public class PerlinNoiseGenerator implements NoiseGenerator {
         }
     }
 
+    private float scale;
+
+    public PerlinNoiseGenerator(float scale) {
+        this.scale = scale;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
     @Override
     public float samplePoint(float x, float y) {
         int X = (int) Math.floor(x) & 0xFF;
@@ -57,7 +73,7 @@ public class PerlinNoiseGenerator implements NoiseGenerator {
         int BA = PERMUTATIONS[B];
         int BB = PERMUTATIONS[B + 1];
 
-        return interpolate(
+        return clamp(interpolate(
                 0,
                 interpolate(
                         v,
@@ -85,7 +101,7 @@ public class PerlinNoiseGenerator implements NoiseGenerator {
                                 grad(PERMUTATIONS[BB + 1], x - 1, y - 1, -1)
                         )
                 )
-        );
+        ) * scale, -3, 3);
     }
 
     private static float grad(int h, float x, float y, float z) {

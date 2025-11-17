@@ -19,16 +19,28 @@ import java.security.SecureRandom;
 
 public class GaussianNoiseGenerator implements NoiseGenerator {
     private final SecureRandom random = new SecureRandom();
-    private final double mu;
-    private final double sigma;
+    private double mu;
+    private double sigma;
 
     public GaussianNoiseGenerator(double mu, double sigma) {
         this.mu = mu;
         this.sigma = sigma;
     }
 
-    public static int clamp(int value, int min, int max) {
-        return Math.max(min, Math.min(value, max));
+    public double getSigma() {
+        return sigma;
+    }
+
+    public void setSigma(double sigma) {
+        this.sigma = sigma;
+    }
+
+    public double getMu() {
+        return mu;
+    }
+
+    public void setMu(double mu) {
+        this.mu = mu;
     }
 
     @Override

@@ -13,15 +13,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package me.cire3.apcsp.create.noise;
+package me.cire3.apcsp.create;
 
-import java.security.SecureRandom;
-
-public class WhiteNoiseGenerator implements NoiseGenerator {
-    private final SecureRandom random = new SecureRandom();
-
-    @Override
-    public float samplePoint(float x, float y) {
-        return (random.nextFloat() - 0.5F) * 2;
+public class MathUtils {
+    public static float clamp(float value, int min, int max) {
+        return Math.max(min, Math.min(value, max));
     }
 }

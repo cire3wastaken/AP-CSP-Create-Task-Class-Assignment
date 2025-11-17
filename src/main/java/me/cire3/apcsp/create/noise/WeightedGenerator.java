@@ -15,13 +15,25 @@
 
 package me.cire3.apcsp.create.noise;
 
-import java.security.SecureRandom;
+public class WeightedGenerator implements NoiseGenerator {
+    private final NoiseGenerator generator;
+    private float weight;
 
-public class WhiteNoiseGenerator implements NoiseGenerator {
-    private final SecureRandom random = new SecureRandom();
+    public WeightedGenerator(NoiseGenerator generator, float weight) {
+        this.generator = generator;
+        this.weight = weight;
+    }
+
+    public float getWeight() {
+        return weight;
+    }
+
+    public void setWeight(float weight) {
+        this.weight = weight;
+    }
 
     @Override
     public float samplePoint(float x, float y) {
-        return (random.nextFloat() - 0.5F) * 2;
+        return weight * generator.samplePoint(x, y);
     }
 }

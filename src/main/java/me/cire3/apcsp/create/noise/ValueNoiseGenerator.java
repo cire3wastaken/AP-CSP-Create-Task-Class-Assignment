@@ -15,6 +15,8 @@
 
 package me.cire3.apcsp.create.noise;
 
+import me.cire3.apcsp.create.MathUtils;
+
 import java.security.SecureRandom;
 
 public class ValueNoiseGenerator implements NoiseGenerator {
@@ -25,7 +27,9 @@ public class ValueNoiseGenerator implements NoiseGenerator {
     private final int dimension;
     private final int mask;
 
-    public ValueNoiseGenerator(int width, int height) {
+    private float scale;
+
+    public ValueNoiseGenerator(int width, int height, float scale) {
         this.dimension = Math.max(width, height);
         this.mask = dimension - 1;
 
@@ -44,6 +48,16 @@ public class ValueNoiseGenerator implements NoiseGenerator {
             permutation[i] = tmp;
             permutation[k + dimension] = permutation[k];
         }
+
+        this.scale = scale;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 
     @Override
@@ -59,10 +73,10 @@ public class ValueNoiseGenerator implements NoiseGenerator {
         int residueY0 = yi & mask;
         int residueY1 = (residueY0 + 1) & mask;
 
-        float c1 = grid[permutation[permutation[residueX0]] + residueY0];
-        float c2 = grid[permutation[permutation[residueX1]] + residueY0];
-        float c3 = grid[permutation[permutation[residueX0]] + residueY1];
-        float c4 = grid[permutation[permutation[residueX1]] + residueY1];
+        float c1 = grid[permutation[permutation[residueX0] + residueY0] & mask];
+        float c2 = grid[permutation[permutation[residueX1] + residueY0] & mask];
+        float c3 = grid[permutation[permutation[residueX0] + residueY1] & mask];
+        float c4 = grid[permutation[permutation[residueX1] + residueY1] & mask];
 
         float sx = ss(dx);
         float sy = ss(dy);
@@ -70,7 +84,7 @@ public class ValueNoiseGenerator implements NoiseGenerator {
         float ix0 = interpolate(c1, c2, sx);
         float iy0 = interpolate(c3, c4, sy);
 
-        return interpolate(ix0, iy0, sy);
+        return MathUtils.clamp(interpolate(ix0, iy0, sy), -2, 2);
     }
 
     private static float ss(float frag) {

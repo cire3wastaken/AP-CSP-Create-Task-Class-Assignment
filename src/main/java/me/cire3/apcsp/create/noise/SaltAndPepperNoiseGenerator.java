@@ -19,9 +19,22 @@ import java.security.SecureRandom;
 
 public class SaltAndPepperNoiseGenerator implements NoiseGenerator {
     private final SecureRandom random = new SecureRandom();
+    private float probability;
+
+    public SaltAndPepperNoiseGenerator(float probability) {
+        this.probability = probability;
+    }
+
+    public float getProbability() {
+        return probability;
+    }
+
+    public void setProbability(float probability) {
+        this.probability = probability;
+    }
 
     @Override
     public float samplePoint(float x, float y) {
-        return random.nextBoolean() ? 1 : 0;
+        return random.nextBoolean() ? 1 : -1;
     }
 }

@@ -15,79 +15,53 @@
 
 package me.cire3.apcsp.create;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 
 public class Main {
-    public static void main(String[] args) {
-    }
+    public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().startsWith("mac");
 
-    public static ImageData loadImageFile(InputStream data, String mime) {
+    public static final Font NUNITO_FONT_20;
+    public static final Font NUNITO_FONT_12;
+
+    static {
+        if (IS_MAC) {
+            System.setProperty("apple.awt.application.appearance", "system");
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.application.name", "AP CSP Create Task Class Assignment");
+        }
         try {
-            BufferedImage img = ImageIO.read(data);
-            if(img == null) {
-                throw new IOException("Data is not a supported image format!");
-            }
-            int w = img.getWidth();
-            int h = img.getHeight();
-            boolean a = img.getColorModel().hasAlpha();
-            int[] pixels = new int[w * h];
-            img.getRGB(0, 0, w, h, pixels, 0, w);
-            for (int i = 0; i < pixels.length; ++i) {
-                int j = pixels[i];
-                if (!a) {
-                    j = j | 0xFF000000;
+            InputStream stream = Main.class.getResourceAsStream("/Nunito.ttf");
+            Font font = Font.createFont(Font.TRUETYPE_FONT, stream);
+            NUNITO_FONT_20 = font.deriveFont(Font.PLAIN, 20);
+            NUNITO_FONT_12 = font.deriveFont(Font.PLAIN, 12);
+            Enumeration<Object> keys = UIManager.getDefaults().keys();
+            while (keys.hasMoreElements()) {
+                Object key = keys.nextElement();
+                Object value = UIManager.get(key);
+                if (value instanceof javax.swing.plaf.FontUIResource) {
+                    UIManager.put(key, NUNITO_FONT_12);
                 }
-                pixels[i] = (j & 0xFF00FF00) | ((j & 0x00FF0000) >>> 16) | ((j & 0x000000FF) << 16);
             }
-            return new ImageData(w, h, pixels, a);
-        }catch(IOException ex) {
-            return null;
+        } catch (FontFormatException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static byte[] convert(int[] ints) {
-        byte[] out = new byte[ints.length * 4];
-        for (int i = 0; i < ints.length; i++) {
-            int pixel = ints[i];
-            int base  = i * 4;
-
-            out[base    ] = (byte) ((pixel      ) & 0xFF);
-            out[base + 1] = (byte) ((pixel >>  8) & 0xFF);
-            out[base + 2] = (byte) ((pixel >> 16) & 0xFF);
-            out[base + 3] = (byte) ((pixel >> 24) & 0xFF);
-        }
-        return out;
-    }
-
-    private record ImageData(int w, int h, int[] pixels, boolean a) {}
-
-    public static void saveRgba2Png(byte[] rgbaBytes, int width, int height, File output) throws IOException {
-        if (rgbaBytes.length != width * height * 4) {
-            throw new IllegalArgumentException("Byte array size does not match width * height * 4");
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(new FlatMacDarkLaf());
+            FlatMacDarkLaf.setup();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int index = (y * width + x) * 4;
-
-                int r = rgbaBytes[index] & 0xFF;
-                int g = rgbaBytes[index + 1] & 0xFF;
-                int b = rgbaBytes[index + 2] & 0xFF;
-                int a = rgbaBytes[index + 3] & 0xFF;
-
-                int argb = (a << 24) | (r << 16) | (g << 8) | b;
-                image.setRGB(x, y, argb);
-            }
-        }
-
-        if (output.getParentFile() != null)
-            output.getParentFile().mkdirs();
-        ImageIO.write(image, "PNG", output);
+        Window launcherWindow = new Window("AP CSP Create Task Class Assignment");
+        launcherWindow.setVisible(true);
     }
 }
